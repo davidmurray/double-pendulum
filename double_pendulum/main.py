@@ -97,6 +97,11 @@ clock = pygame.time.Clock()
 last_solution = initial_conditions
 last_time = t0
 
+TRACING = True
+pendulum_2_position_history = 10 * [Point(0, 0)]
+
+i = 0
+
 while True:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
@@ -124,7 +129,14 @@ while True:
 	pendulum_1.scale(-1000, -1000).translate(WIDTH / 2, CENTER.y).round()
 	pendulum_2.scale(-1000, -1000).translate(WIDTH / 2, CENTER.y).round()
 
+	pendulum_2_position_history[i % 10] = pendulum_2
+	i = i + 1
+
 	screen.fill(WHITE)
+
+	if TRACING:
+		for idx, position in enumerate(pendulum_2_position_history):
+			pygame.draw.circle(screen, (255, 127, 0), position.to_tuple(), 10 - idx)
 
 	pygame.draw.line(screen, BLACK, CENTER.to_tuple(), pendulum_1.to_tuple(), 5)
 	pygame.draw.line(screen, BLACK, pendulum_1.to_tuple(), pendulum_2.to_tuple(), 5)
