@@ -63,46 +63,19 @@ def pendulum_ODE_system(t, w):
 
 	return f
 
-def find_nearest_value(array, value):
-	"""
-	Finds and returns the nearest value to `value` in an array.
-	
-	Arguments:
-		array : array
-		value : value to find the closest value to
-
-	Return:
-		(value, index) : the value and the index, respectively.
-	"""
-	
-	array = np.asarray(array)
-	index = np.abs(array - value).argmin()
-
-	return (array[index], index)
-
 ## Initial conditions
 # y1: angle (rad), first pendulum
 # y2: angular velocity (rad/s), first pendulum
 # y3: angle (rad), second pendulum
 # y4: angular velocity (rad/s), second pendulum
+# t0: initial time (in seconds)
 y1_0 = np.radians(45)
 y2_0 = 4
 y3_0 = np.radians(10)
 y4_0 = 4
+t0 = 0
 
 initial_conditions = [y1_0, y2_0, y3_0, y4_0]
-
-t0 = 0
-tf = 15
-num_points = 1000
-t_points = np.linspace(t0, tf, num_points)
-
-POINTS_PER_SECOND = num_points / (tf - t0)
-
-solution = scipy.integrate.solve_ivp(pendulum_ODE_system, (t0, tf), initial_conditions, t_eval = list(t_points))
-
-print(solution)
-
 
 ## PyGame
 
@@ -121,7 +94,8 @@ size = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
-total_time = 0
+last_solution = initial_conditions
+last_time = t0
 
 while True:
 	for event in pygame.event.get():
@@ -133,19 +107,16 @@ while True:
 	# We divide by 1000 to get seconds
 	dt = clock.tick(50) / 1000
 
-	total_time = total_time + dt
+	new_solution = scipy.integrate.solve_ivp(pendulum_ODE_system, (last_time, last_time + dt), last_solution)
 
-	# Restart the animation at t = t0:
-	if total_time > tf:
-		total_time = t0
+	index = len(new_solution.t) - 1
+	y1 = new_solution.y[0, index]
+	y2 = new_solution.y[1, index]
+	y3 = new_solution.y[2, index]
+	y4 = new_solution.y[3, index]
 
-	value, index = find_nearest_value(solution.t, total_time)
-	print(value, index)
-
-	y1 = solution.y[0][index]
-	y2 = solution.y[1][index]
-	y3 = solution.y[2][index]
-	y4 = solution.y[3][index]
+	last_solution = new_solution.y[:, index]
+	last_time = new_solution.t.max()
 
 	pendulum_1 = Point(l1 * sin(y1), - l1 * cos(y1))
 	pendulum_2 = Point(pendulum_1.x + l2 * sin(y3), pendulum_1.y - l2 * cos(y3))
