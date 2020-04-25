@@ -70,10 +70,10 @@ def pendulum_ODE_system(t, w):
 # y3: angle (rad), second pendulum
 # y4: angular velocity (rad/s), second pendulum
 # t0: initial time (in seconds)
-y1_0 = np.radians(45)
+y1_0 = np.radians(0)
 y2_0 = 4
-y3_0 = np.radians(10)
-y4_0 = 4
+y3_0 = np.radians(0)
+y4_0 = 0
 t0 = 0
 
 initial_conditions = [y1_0, y2_0, y3_0, y4_0]
@@ -99,6 +99,8 @@ last_solution = initial_conditions
 last_time = t0
 
 TRACING = True
+TRACING_MODE = "lines" # "lines" or "dots"
+TRACING_MAX_DOTS = np.inf
 pendulum_2_position_history = []
 
 i = 0
@@ -130,22 +132,26 @@ while True:
 	pendulum_1.scale(-1000, -1000).translate(WIDTH / 2, CENTER.y).round()
 	pendulum_2.scale(-1000, -1000).translate(WIDTH / 2, CENTER.y).round()
 
-	if i < 200:
-		pendulum_2_position_history.append(pendulum_2)
-	else:
-		pendulum_2_position_history[i % 200] = pendulum_2
-	i = i + 1
-
 	screen.fill(WHITE)
 
 	if TRACING:
-		for i in range(0, len(pendulum_2_position_history)):
-			if i > 0:
-				start_point = pendulum_2_position_history[i - i]
-				end_point = pendulum_2_position_history[i]
-				pygame.draw.aaline(screen, BLACK, start_point.to_tuple(), end_point.to_tuple(), 5)
+		if TRACING_MODE == "lines":
+			pendulum_2_position_history.append(pendulum_2)
 
-			#pygame.draw.circle(screen, BLUE, position.to_tuple(), 10)# - idx)
+			for idx, position in enumerate(pendulum_2_position_history):
+				if idx > 0:
+					previous_point = pendulum_2_position_history[idx - 1]
+					pygame.draw.aaline(screen, BLUE, previous_point.to_tuple(), position.to_tuple(), 5)
+		else:
+			if i < TRACING_MAX_DOTS:
+				pendulum_2_position_history.append(pendulum_2)
+			else:
+				pendulum_2_position_history[i % TRACING_MAX_DOTS] = pendulum_2
+
+			i = i + 1
+
+			for position in pendulum_2_position_history:
+				pygame.draw.circle(screen, BLUE, position.to_tuple(), 4)
 
 	pygame.draw.aaline(screen, BLACK, CENTER.to_tuple(), pendulum_1.to_tuple(), 5)
 	pygame.draw.aaline(screen, BLACK, pendulum_1.to_tuple(), pendulum_2.to_tuple(), 5)
