@@ -36,9 +36,9 @@ class Point(object):
 
 # Length, in meters, of the two rods
 l1 = l2 = 0.3
-# Passes, in kilograms, of the two spheres
+# Masses, in kilograms, of the two spheres
 m1 = 0.5
-m2 = 0.02
+m2 = 0.5
 # Gravitational constant
 g = 9.81
 
@@ -70,8 +70,8 @@ def pendulum_ODE_system(t, w):
 # y3: angle (rad), second pendulum
 # y4: angular velocity (rad/s), second pendulum
 # t0: initial time (in seconds)
-y1_0 = np.radians(0)
-y2_0 = 4
+y1_0 = np.radians(45)
+y2_0 = 2
 y3_0 = np.radians(0)
 y4_0 = 0
 t0 = 0
@@ -84,7 +84,7 @@ pygame.init()
 
 WIDTH = 1200
 HEIGHT = 800
-CENTER = Point(WIDTH / 2, 15).round()
+CENTER = Point(WIDTH / 2, 20).round()
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -129,8 +129,8 @@ while True:
 	pendulum_1 = Point(l1 * sin(y1), - l1 * cos(y1))
 	pendulum_2 = Point(pendulum_1.x + l2 * sin(y3), pendulum_1.y - l2 * cos(y3))
 
-	pendulum_1.scale(-1000, -1000).translate(WIDTH / 2, CENTER.y).round()
-	pendulum_2.scale(-1000, -1000).translate(WIDTH / 2, CENTER.y).round()
+	pendulum_1.scale(1000, -1000).translate(WIDTH / 2, CENTER.y).round()
+	pendulum_2.scale(1000, -1000).translate(WIDTH / 2, CENTER.y).round()
 
 	screen.fill(WHITE)
 
