@@ -37,7 +37,8 @@ class Point(object):
 # Length, in meters, of the two rods
 l1 = l2 = 0.3
 # Passes, in kilograms, of the two spheres
-m1 = m2 = 0.5
+m1 = 0.5
+m2 = 0.02
 # Gravitational constant
 g = 9.81
 
@@ -98,7 +99,7 @@ last_solution = initial_conditions
 last_time = t0
 
 TRACING = True
-pendulum_2_position_history = 10 * [Point(0, 0)]
+pendulum_2_position_history = []
 
 i = 0
 
@@ -129,19 +130,27 @@ while True:
 	pendulum_1.scale(-1000, -1000).translate(WIDTH / 2, CENTER.y).round()
 	pendulum_2.scale(-1000, -1000).translate(WIDTH / 2, CENTER.y).round()
 
-	pendulum_2_position_history[i % 10] = pendulum_2
+	if i < 200:
+		pendulum_2_position_history.append(pendulum_2)
+	else:
+		pendulum_2_position_history[i % 200] = pendulum_2
 	i = i + 1
 
 	screen.fill(WHITE)
 
 	if TRACING:
-		for idx, position in enumerate(pendulum_2_position_history):
-			pygame.draw.circle(screen, (255, 127, 0), position.to_tuple(), 10 - idx)
+		for i in range(0, len(pendulum_2_position_history)):
+			if i > 0:
+				start_point = pendulum_2_position_history[i - i]
+				end_point = pendulum_2_position_history[i]
+				pygame.draw.aaline(screen, BLACK, start_point.to_tuple(), end_point.to_tuple(), 5)
 
-	pygame.draw.line(screen, BLACK, CENTER.to_tuple(), pendulum_1.to_tuple(), 5)
-	pygame.draw.line(screen, BLACK, pendulum_1.to_tuple(), pendulum_2.to_tuple(), 5)
-	pygame.draw.circle(screen, BLACK, CENTER.to_tuple(), 10)
-	pygame.draw.circle(screen, GREEN, pendulum_1.to_tuple(), 10)
-	pygame.draw.circle(screen, BLUE, pendulum_2.to_tuple(), 10)
+			#pygame.draw.circle(screen, BLUE, position.to_tuple(), 10)# - idx)
+
+	pygame.draw.aaline(screen, BLACK, CENTER.to_tuple(), pendulum_1.to_tuple(), 5)
+	pygame.draw.aaline(screen, BLACK, pendulum_1.to_tuple(), pendulum_2.to_tuple(), 5)
+	pygame.draw.circle(screen, BLACK, CENTER.to_tuple(), 15)
+	pygame.draw.circle(screen, GREEN, pendulum_1.to_tuple(), 15)
+	pygame.draw.circle(screen, BLUE, pendulum_2.to_tuple(), 15)
 
 	pygame.display.flip()
