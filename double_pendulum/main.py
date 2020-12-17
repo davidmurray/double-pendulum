@@ -1,4 +1,6 @@
 import sys
+from collections import deque
+
 import numpy as np
 from numpy import sin, cos
 import scipy.integrate
@@ -106,11 +108,9 @@ last_solution = initial_conditions
 last_time = t0
 
 TRACING = True
-TRACING_MODE = "lines" # "lines" or "dots"
-TRACING_MAX_DOTS = np.inf
+TRACING_MODE = "dots" # "lines" or "dots"
+TRACING_MAX_DOTS = 9
 pendulum_2_position_history = []
-
-i = 0
 
 while True:
 	for event in pygame.event.get():
@@ -142,23 +142,19 @@ while True:
 	screen.fill(WHITE)
 
 	if TRACING:
-		if TRACING_MODE == "lines":
-			pendulum_2_position_history.append(pendulum_2)
+		pendulum_2_position_history.append(pendulum_2)
 
+		if TRACING_MODE == "lines":
 			for idx, position in enumerate(pendulum_2_position_history):
 				if idx > 0:
 					previous_point = pendulum_2_position_history[idx - 1]
 					pygame.draw.aaline(screen, BLUE, previous_point.to_tuple(), position.to_tuple(), 5)
 		else:
-			if i < TRACING_MAX_DOTS:
-				pendulum_2_position_history.append(pendulum_2)
-			else:
-				pendulum_2_position_history[i % TRACING_MAX_DOTS] = pendulum_2
+			recent_positions = deque(pendulum_2_position_history, maxlen=TRACING_MAX_DOTS)
 
-			i = i + 1
-
-			for position in pendulum_2_position_history:
-				draw_aa_circle(screen, position.to_tuple(), 4, BLUE)
+			for i, position in enumerate(reversed(recent_positions)):
+				size = max(3, 10-i)
+				draw_aa_circle(screen, position.to_tuple(), size, BLUE)
 
 	pygame.draw.aaline(screen, BLACK, CENTER.to_tuple(), pendulum_1.to_tuple(), 5)
 	pygame.draw.aaline(screen, BLACK, pendulum_1.to_tuple(), pendulum_2.to_tuple(), 5)
