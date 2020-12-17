@@ -1,7 +1,9 @@
+import sys
 import numpy as np
 from numpy import sin, cos
 import scipy.integrate
-import sys, pygame
+import pygame
+import pygame.gfxdraw
 
 class Point(object):
 	def __init__(self, x, y):
@@ -63,6 +65,11 @@ def pendulum_ODE_system(t, w):
 		(2*sin(y1-y3)*(y2**2*l1*(m1+m2)+g*(m1+m2)*cos(y1)+y4**2*l2*m2*cos(y1-y3)))/(l2*(2*m1+m2-m2*cos(2*y1-2*y3)))]
 
 	return f
+
+def draw_aa_circle(surface, center, radius, color):
+	x, y = center
+	pygame.gfxdraw.aacircle(surface, x, y, radius, color)
+	pygame.gfxdraw.filled_circle(surface, x, y, radius, color)
 
 ## Initial conditions
 # y1: angle (rad), first pendulum
@@ -151,12 +158,12 @@ while True:
 			i = i + 1
 
 			for position in pendulum_2_position_history:
-				pygame.draw.circle(screen, BLUE, position.to_tuple(), 4)
+				draw_aa_circle(screen, position.to_tuple(), 4, BLUE)
 
 	pygame.draw.aaline(screen, BLACK, CENTER.to_tuple(), pendulum_1.to_tuple(), 5)
 	pygame.draw.aaline(screen, BLACK, pendulum_1.to_tuple(), pendulum_2.to_tuple(), 5)
-	pygame.draw.circle(screen, BLACK, CENTER.to_tuple(), 15)
-	pygame.draw.circle(screen, GREEN, pendulum_1.to_tuple(), 15)
-	pygame.draw.circle(screen, BLUE, pendulum_2.to_tuple(), 15)
+	draw_aa_circle(screen, CENTER.to_tuple(), 15, BLACK)
+	draw_aa_circle(screen, pendulum_1.to_tuple(), 15, GREEN)
+	draw_aa_circle(screen, pendulum_2.to_tuple(), 15, BLUE)
 
 	pygame.display.flip()
