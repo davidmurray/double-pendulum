@@ -149,12 +149,14 @@ while True:
 				if idx > 0:
 					previous_point = pendulum_2_position_history[idx - 1]
 					pygame.draw.aaline(screen, BLUE, previous_point.to_tuple(), position.to_tuple(), 5)
-		else:
+		elif TRACING_MODE == "dots":
 			recent_positions = deque(pendulum_2_position_history, maxlen=TRACING_MAX_DOTS)
 
 			for i, position in enumerate(reversed(recent_positions)):
 				size = max(3, 10-i)
 				draw_aa_circle(screen, position.to_tuple(), size, BLUE)
+		else:
+			raise ValueError(f"{TRACING_MODE} is not a supported tracing mode.")
 
 	pygame.draw.aaline(screen, BLACK, CENTER.to_tuple(), pendulum_1.to_tuple(), 5)
 	pygame.draw.aaline(screen, BLACK, pendulum_1.to_tuple(), pendulum_2.to_tuple(), 5)
