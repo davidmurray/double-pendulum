@@ -107,8 +107,7 @@ clock = pygame.time.Clock()
 last_solution = initial_conditions
 last_time = t0
 
-TRACING = True
-TRACING_MODE = "dots" # "lines" or "dots"
+TRACING_MODE = "dots" # "lines", "dots" or None.
 TRACING_MAX_DOTS = 9
 pendulum_2_position_history = []
 
@@ -141,7 +140,7 @@ while True:
 
 	screen.fill(WHITE)
 
-	if TRACING:
+	if TRACING_MODE != None:
 		pendulum_2_position_history.append(pendulum_2)
 
 		if TRACING_MODE == "lines":
