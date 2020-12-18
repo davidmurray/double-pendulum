@@ -97,6 +97,7 @@ CENTER = Point(WIDTH / 2, 20).round()
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
@@ -107,7 +108,7 @@ clock = pygame.time.Clock()
 last_solution = initial_conditions
 last_time = t0
 
-TRACING_MODE = "dots" # "lines", "dots" or None.
+TRACING_MODES = ["string"] # "lines", "dots", "string" or empty list / None.
 TRACING_MAX_DOTS = 9
 pendulum_2_position_history = []
 
@@ -140,22 +141,25 @@ while True:
 
 	screen.fill(WHITE)
 
-	if TRACING_MODE != None:
+	if TRACING_MODES:
 		pendulum_2_position_history.append(pendulum_2)
 
-		if TRACING_MODE == "lines":
+		if "lines" in TRACING_MODES:
 			for idx, position in enumerate(pendulum_2_position_history):
 				if idx > 0:
 					previous_point = pendulum_2_position_history[idx - 1]
 					pygame.draw.aaline(screen, BLUE, previous_point.to_tuple(), position.to_tuple(), 5)
-		elif TRACING_MODE == "dots":
+		if "string" in TRACING_MODES:
+			points = [point.to_tuple() for point in pendulum_2_position_history]
+			points = points[-20:] # Get the last 20 points.
+			if len(points) > 3: # Bezier curves need at least 3 points.
+				pygame.gfxdraw.bezier(screen, points, 3, RED)
+		if "dots" in TRACING_MODES:
 			recent_positions = deque(pendulum_2_position_history, maxlen=TRACING_MAX_DOTS)
 
 			for i, position in enumerate(reversed(recent_positions)):
 				size = max(3, 10-i)
 				draw_aa_circle(screen, position.to_tuple(), size, BLUE)
-		else:
-			raise ValueError(f"{TRACING_MODE} is not a supported tracing mode.")
 
 	pygame.draw.aaline(screen, BLACK, CENTER.to_tuple(), pendulum_1.to_tuple(), 5)
 	pygame.draw.aaline(screen, BLACK, pendulum_1.to_tuple(), pendulum_2.to_tuple(), 5)
